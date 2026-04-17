@@ -98,6 +98,20 @@ Het notebook is zo opgebouwd dat het van begin tot eind uitvoerbaar is zonder ha
 
 Reproduceerbaarheid is geborgd via vaste seeds, cuDNN deterministic mode en group-aware splitsing op locatie.
 
+### Kerncijfers
+
+**Vergelijking op testset (macro F1)**
+
+| Model | Test macro F1 | Match ratio |
+|---|---|---|
+| Null model | 0.2120 | 0.3344 |
+| Logistic regression baseline | 0.4557 | 0.0989 |
+| CNN from scratch | 0.5123 | 0.1584 |
+| EfficientNet-B7 (drempel 0.50) | 0.6604 | 0.3515 |
+| EfficientNet-B7 (tuned drempels) | 0.6595 | 0.3789 |
+
+**Beste setting:** EfficientNet-B7, learning rate 1e-3 op de classificatielaag, resolutie 512×512, met augmentatie.
+
 ## Evaluatie
 
 De primaire metriek is macro F1, zodat alle vier de labels even zwaar meewegen ondanks de onbalans tussen healthy (meest voorkomend) en rubble (zeldzaamst). Secundaire metrieken zijn match ratio, per-label precision en recall, en per-label F1. De testset wordt alleen ingezet voor de finale evaluatie. Modelselectie en drempeloptimalisatie vinden uitsluitend op de validatieset plaats.
