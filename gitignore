@@ -1,0 +1,34 @@
+# Data (downloaden via Google Drive, niet in repo)
+data/
+*.zip
+*.tar.gz
+*.jpg
+*.jpeg
+*.png
+!reports/*.png
+
+# Model checkpoints
+*.pt
+*.pth
+checkpoints/
+
+# Jupyter
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+env/
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
