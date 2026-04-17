@@ -1,61 +1,64 @@
-# Multi-label classificatie van koraalrifcondities met deep learning
+# Multi-label classificatie van koraalrifcondities
 
-## Over dit project
+Multi-label classificatie van koraalrifcondities (healthy, compromised, dead, rubble) op de Koh Tao Coral Condition Dataset, met een vergelijking tussen een CNN from scratch en transfer learning met ImageNet-pretrained backbones (ResNet-101, DenseNet-201, EfficientNet-B7).
 
-Koraalriffen staan wereldwijd onder druk. Het handmatig beoordelen van onderwaterbeelden kost tot 80 minuten per 100 meter transect. Dit project onderzoekt of deep learning die classificatie kan automatiseren.
-
-Een CNN from scratch en drie transfer learning modellen (EfficientNet-B7, ResNet-101, DenseNet-201) worden vergeleken op multi-label classificatie van vier koraalcondities: healthy, compromised, dead en rubble. Het beste model (EfficientNet-B7, frozen backbone, lr=1e-3, 512px) haalt na drempeloptimalisatie per label een macro F1 van 0.58 op de testset.
-
-## Dataset
-
-**Koh Tao Coral Condition Dataset** van Shao et al. (2024, 2025)
-
-- 23.924 beeldpatches na deduplicatie (origineel 23.965).
-- Resolutie: 512 x 512 pixels.
-- 4 conditielabels: healthy, compromised, dead, rubble.
-- Verzameld op 15 duiklocaties rond Koh Tao, Thailand.
-- Geannoteerd door experts in mariene ecologie.
-
-Bron: [GitHub](https://github.com/XL-SHAO/CoralConditionDataset) en [Google Drive](https://drive.google.com/drive/folders/1yjvVGSXuFRcO3b0SehyeAHzMtCHhI6S1)
+**Auteur:** Rainesh Rewat
 
 ## Repositorystructuur
 
 ```
-coral_multilabel_classification.ipynb   # Hoofdnotebook (rapport + code)
-README.md                               # Dit bestand
-requirements.txt                        # Python dependencies
+.
+├── coral_multilabel_classification.ipynb   Hoofdnotebook (rapport + code)
+├── README.md                               Dit bestand
+├── requirements.txt                        Python dependencies
+└── .gitignore                              Git ignore-regels
 ```
 
-## Resultaten
+Het notebook bevat zowel de methodologische beschrijving als de uitvoerbare code en is het enige deliverable dat daadwerkelijk uitgevoerd hoeft te worden.
 
-| Model | Macro F1 | Match ratio | Set |
-|-------|----------|-------------|-----|
-| Null model | 0.21 | 0.33 | test |
-| LR baseline | 0.45 | 0.10 | test |
-| CNN from scratch | 0.50 | 0.12 | test |
-| EfficientNet-B7 (getuned) | 0.58 | 0.26 | test |
+## Dataset
 
-Per-label resultaten (testset, geoptimaliseerde drempels):
+De Koh Tao Coral Condition Dataset (Shao et al., 2024) bevat gelabelde 512×512 patches uit onderwateropnames op Koh Tao, Thailand. Vier conditielabels zijn gebruikt: healthy, compromised, dead en rubble.
 
-| Label | Precision | Recall | F1 |
-|-------|-----------|--------|-----|
-| healthy | 0.80 | 0.92 | 0.86 |
-| compromised | 0.39 | 0.58 | 0.47 |
-| dead | 0.46 | 0.82 | 0.59 |
-| rubble | 0.29 | 0.69 | 0.40 |
+Download de dataset via Google Drive:
+https://drive.google.com/drive/folders/1-D5oFKGHvJv9Yf7oIG5m3OvmIplIk6OX?usp=sharing
 
-## Uitvoeren
+Plaats de gedownloade bestanden zoals aangegeven in sectie 5 van het notebook. Bij gebruik van Google Colab kan de dataset direct vanuit Google Drive worden gemount.
 
-### Google Colab (aanbevolen)
+Originele bron: Shao, X., Chen, H., Magson, K., Wang, J., Song, J., Chen, J., Sasaki, J. (2024). Deep Learning for Multilabel Classification of Coral Reef Conditions in the Indo-Pacific Using Underwater Photo Transect Method. *Aquatic Conservation: Marine and Freshwater Ecosystems*, 34(9), e4241.
 
-1. Upload het notebook naar Google Colab
-2. Stel de runtime in op GPU
-3. Voer alle cellen uit van boven naar beneden
+## Python versie en omgeving
 
-De dataset wordt automatisch gedownload vanuit GitHub en Google Drive.
+- Python 3.12 of hoger
+- CUDA-capabele GPU vereist (T4 of beter)
+- BF16-support wordt automatisch gedetecteerd (is_bf16_supported), anders wordt FP16 of FP32 gebruikt
 
-Link naar Google Colab: https://colab.research.google.com/drive/1fjBjI9kLr6ZSR1dRz-J_9pOIEjhtPvr3?usp=sharing
+## Installatie
 
+### Optie 1 — Google Colab (aanbevolen)
+
+Het notebook is ontwikkeld en getest in Google Colab en kan rechtstreeks worden geopend:
+
+https://colab.research.google.com/drive/1sFf7l3w44vlk7SkQXHl7-zKH-zPrCPJp?usp=sharing
+
+Stappen:
+1. Open de bovenstaande link
+2. Zet de runtime op GPU: Runtime → Change runtime type → T4 GPU
+3. Voer alle cellen uit (Runtime → Run all)
+
+Colab heeft de meeste dependencies al voorgeïnstalleerd. De `imagehash` library wordt automatisch geïnstalleerd in de eerste cellen van het notebook.
+
+### Optie 2 — Lokale installatie
+
+```bash
+git clone <repo-url>
+cd coral-condition-classification
+python -m venv venv
+source venv/bin/activate   # Linux/macOS
+# venv\Scripts\activate    # Windows
+pip install -r requirements.txt
+jupyter notebook coral_multilabel_classification.ipynb
+```
 ### Lokaal
 
 1. Maak een virtuele omgeving aan:
@@ -75,29 +78,30 @@ Link naar Google Colab: https://colab.research.google.com/drive/1fjBjI9kLr6ZSR1d
 
 ## Trainingsomgeving
 
-- Python 3.12
+- Python 3.12.13
 - PyTorch 2.10.0, Torchvision 0.25.0
 - GPU: NVIDIA RTX PRO 6000 (95 GB) via Google Colab
 - Mixed precision (AMP) en channels_last geheugenformaat
-- Deterministic mode ingeschakeld (seed=42)
 
-## Aanpak
+## Experimenten uitvoeren
 
-1. **Data voorbereiding**: deduplicatie, group-aware split (70/10/20), EDA op trainingsset
-2. **Baselines**: null model en logistic regression op kleurkenmerken
-3. **Iteratie 1**: CNN from scratch (4 convolutielagen)
-4. **Iteratie 2**: drie transfer learning modellen met frozen backbone
-5. **Ablations**: learning rate (1e-4 vs 1e-3) en resolutie (512 vs 224) apart gevarieerd
-6. **Drempeloptimalisatie**: per label op de validatieset
-7. **Evaluatie**: eenmalig op de testset
-8. **Interpreteerbaarheid**: GradCAM per conditielabel
+Het notebook is zo opgebouwd dat het van begin tot eind uitvoerbaar is zonder handmatige tussenstappen. Voer de cellen in volgorde uit:
 
-## Auteur
+1. Setup en configuratie (secties 5–6)
+2. Datalaad en split (secties 7–10)
+3. EDA op de trainset (secties 11–12)
+4. Iteratie 1: CNN from scratch (secties 13–14)
+5. Iteratie 2: Vergelijking transfer learning modellen (secties 15–16)
+6. Iteratie 3: Ablationstudies op EfficientNet-B7 (secties 17–19)
+7. Robuustheidstest, drempeloptimalisatie en finale testevaluatie (secties 20–22)
+8. GradCAM op misclassificaties (sectie 23)
 
-Rainesh Rewat
+Reproduceerbaarheid is geborgd via vaste seeds, cuDNN deterministic mode en group-aware splitsing op locatie.
 
-## Referenties
+## Evaluatie
 
-Shao, X. et al. (2024). Deep Learning for Multilabel Classification of Coral Reef Conditions in the Indo-Pacific. *Aquatic Conservation*, 34(9), e4241.
+De primaire metriek is macro F1, zodat alle vier de labels even zwaar meewegen ondanks de onbalans tussen healthy (meest voorkomend) en rubble (zeldzaamst). Secundaire metrieken zijn match ratio, per-label precision en recall, en per-label F1. De testset wordt alleen ingezet voor de finale evaluatie. Modelselectie en drempeloptimalisatie vinden uitsluitend op de validatieset plaats.
 
-Shao, X. et al. (2025). Multi-label classification for multi-temporal, multi-spatial coral reef condition monitoring. *arXiv:2503.23012*.
+## Licentie
+
+MIT License.
