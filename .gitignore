@@ -32,3 +32,7 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Lokale notebookdata en caches
+coral_multilabel/
+*.rar

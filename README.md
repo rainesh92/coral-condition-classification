@@ -51,7 +51,7 @@ Colab heeft de meeste dependencies al voorgeïnstalleerd. De `imagehash` library
 ### Optie 2 — Lokale installatie
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/rainesh92/coral-condition-classification.git
 cd coral-condition-classification
 python -m venv venv
 source venv/bin/activate   # Linux/macOS
@@ -59,23 +59,6 @@ source venv/bin/activate   # Linux/macOS
 pip install -r requirements.txt
 jupyter notebook coral_multilabel_classification.ipynb
 ```
-### Lokaal
-
-1. Maak een virtuele omgeving aan:
-   ```
-   python -m venv venv
-   source venv/bin/activate
-   ```
-2. Installeer dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
-3. Zorg voor een GPU met minimaal 16 GB VRAM
-4. Voer het notebook uit in Jupyter:
-   ```
-   jupyter notebook coral_multilabel_classification_v1.ipynb
-   ```
-
 ## Trainingsomgeving
 
 - Python 3.12.13
@@ -85,7 +68,7 @@ jupyter notebook coral_multilabel_classification.ipynb
 
 ## Experimenten uitvoeren
 
-Het notebook is zo opgebouwd dat het van begin tot eind uitvoerbaar is zonder handmatige tussenstappen. Voer de cellen in volgorde uit:
+Downloadtoegang tot de dataset en een werkende RAR-uitpaktool (`unrar`) zijn nodig. De automatische installatie van `unrar` gebruikt `apt-get` en werkt alleen in een geschikte Linux-omgeving met voldoende rechten. Voer de cellen in volgorde uit:
 
 1. Setup en configuratie (secties 5–6)
 2. Datalaad en split (secties 7–10)
@@ -96,9 +79,11 @@ Het notebook is zo opgebouwd dat het van begin tot eind uitvoerbaar is zonder ha
 7. Robuustheidstest, drempeloptimalisatie en finale testevaluatie (secties 20–22)
 8. GradCAM op misclassificaties (sectie 23)
 
-Reproduceerbaarheid is geborgd via vaste seeds, cuDNN deterministic mode en group-aware splitsing op locatie.
+Vaste seeds en cuDNN deterministic mode beperken variatie tussen runs. Groepssleutels worden automatisch uit metadata of paden afgeleid. Controleer de gekozen sleutel tegen de echte opnamelocaties of transecten. Bij de stratified fallback is scheiding van locaties niet gegarandeerd. Resultaten kunnen verschillen tussen hardware- en softwareversies.
 
 ### Kerncijfers
+
+Onderstaande cijfers komen uit de oorspronkelijke run. De notebookcode is daarna gecorrigeerd voor normalisatie en drempeloptimalisatie. De uitvoer is gewist en de modellen moeten opnieuw worden getraind voordat deze cijfers voor de gecorrigeerde versie kunnen worden bevestigd.
 
 **Vergelijking op testset (macro F1)**
 
@@ -119,3 +104,11 @@ De primaire metriek is macro F1, zodat alle vier de labels even zwaar meewegen o
 ## Licentie
 
 MIT License.
+
+## Codecontroles zonder GPU of dataset
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Deze tests controleren de notebooksyntax, normalisatie, drempeloptimalisatie en ontbrekende verificatieresultaten. Volledige training en validatie vereisen de dataset en een geschikte GPU.
